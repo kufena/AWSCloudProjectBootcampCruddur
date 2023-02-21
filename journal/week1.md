@@ -25,3 +25,18 @@ But somewhere the navigation on the left has cocked up and I see something a bit
 
 I have been doing this for sometime.  It's really easy to do, although i have always run it as an endpoint (seperate container) and never in the docker compose context, which I guess would be more useful?  
 
+## Adding dynamodb and postgres to the docker compose.
+
+Yep that seemed to work ok, although I'm not entirely sure still what all the docker compose bits do.  I guess that's some work for while I'm away at the Norfolk Developers conference.
+
+## Running the whole thing locally.
+
+This did NOT go so well, largely because I am not sure what is going on with flask and react and all that.
+For a start, it didn't like *FLASK_ENV* and kept saying it was deprecated?  Also, the compose file itself builds some environment variables - *FRONTEND_URL* and *BACKEND_URL* using some gitpod specific environment variables.  Once I'd worked that out, it was easy to modify those to just use localhost and the respective pots and it ran ok.
+
+I am still getting a problem with the navigation in the front end, though.  Two screenshots here, showing the home and notifications pages which I can get to by URL, but not through the navigation links, which aren't showing.
+
+<p><img src="./Screenshot 2023-02-21 194511.png"/>
+<p><img src="./Screenshot 2023-02-21 194541.png"/>
+
+
