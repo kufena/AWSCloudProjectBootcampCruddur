@@ -1,5 +1,8 @@
 import uuid
 from datetime import datetime, timedelta, timezone
+from opentelemetry import trace
+tracer = trace.get_tracer("create.reply")
+
 class CreateReply:
   def run(message, user_handle, activity_uuid):
     model = {
@@ -28,12 +31,18 @@ class CreateReply:
       }
     else:
       now = datetime.now(timezone.utc).astimezone()
-      model['data'] = {
-        'uuid': uuid.uuid4(),
-        'display_name': 'Andrew Brown',
-        'handle':  user_handle,
-        'message': message,
-        'created_at': now.isoformat(),
-        'reply_to_activity_uuid': activity_uuid
-      }
+      with tracer.start_as_current_span("http-handler") as outer_span:
+        outer_span.set_attribute("outer", True)
+        model['data'] = {
+          'uuid': uuid.uuid4(),
+          'display_name': 'Andrew Brown',
+          'handle':  user_handle,
+          'message': message,
+          'created_at': now.isoformat(),
+          'reply_to_activity_uuid': activity_uuid
+        }
+
+        span = trace.get_current_span()
+        span.set_attribute("user.id", uuid.uuid4())
+        span.set_attribute("message", message)
     return model
