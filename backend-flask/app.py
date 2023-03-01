@@ -24,8 +24,8 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 # from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
 
 # XRay specific imports and stuff.
-from aws_xray_sdk.core import xray_recorder
-from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
+#from aws_xray_sdk.core import xray_recorder
+#from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
 
 # Watchtower specific imports.
 import watchtower
@@ -57,9 +57,9 @@ FlaskInstrumentor().instrument_app(app)
 RequestsInstrumentor().instrument()
 
 # X-Ray middleware initialisation.
-xray_url = os.getenv("AWS_XRAY_URL")
-xray_recorder.configure(service='backend-flask', dynamic_naming=xray_url)
-XRayMiddleware(app, xray_recorder)
+#xray_url = os.getenv("AWS_XRAY_URL")
+#xray_recorder.configure(service='backend-flask', dynamic_naming=xray_url)
+#XRayMiddleware(app, xray_recorder)
 
 # General
 frontend = os.getenv('FRONTEND_URL')
