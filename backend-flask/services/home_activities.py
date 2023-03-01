@@ -1,12 +1,15 @@
 from datetime import datetime, timedelta, timezone
 from opentelemetry import trace
+import logging
 
 tracer = trace.get_tracer("home.activities")
 
 class HomeActivities:
-  def run():
+  def run(Logger):
     with tracer.start_as_current_span("home-activities-mock-data"):
     
+        Logger.info("Hello cloudwatch logs yada yada yada.");
+
         now = datetime.now(timezone.utc).astimezone()
         results = [{
           'uuid': '68f126b0-1ceb-4a33-88be-d90fa7109eee',
