@@ -4,12 +4,12 @@ services:
     environment:
       FRONTEND_URL: "https://${CODESPACE_NAME}-3000.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
       BACKEND_URL: "https://${CODESPACE_NAME}-4567.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
-
+      HONEYCOMB_API_KEY: "${HONEYCOMB_API_KEY}"
       OTEL_SERVICE_NAME: "backend-flask"
       OTEL_EXPORTER_OTLP_ENDPOINT: "https://api.honeycomb.io"
       OTEL_EXPORTER_OTLP_HEADERS: "x-honeycomb-team=${HONEYCOMB_API_KEY}"
-      AWS_XRAY_URL: "https://${CODESPACE_NAME}-4567.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
-      AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
+#      AWS_XRAY_URL: "https://${CODESPACE_NAME}-4567.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
+#      AWS_XRAY_DAEMON_ADDRESS: "xray-daemon:2000"
       AWS_DEFAULT_REGION: "${AWS_DEFAULT_REGION}"
       AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
       AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
@@ -22,49 +22,50 @@ services:
   frontend-react-js:
     environment:
       REACT_APP_BACKEND_URL: "https://${CODESPACE_NAME}-4567.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
+      HONEYCOMB_API_KEY: "${HONEYCOMB_API_KEY}"
     build: ./frontend-react-js
     ports:
       - "3000:3000"
     volumes:
       - ./frontend-react-js:/frontend-react-js
-  xray-daemon:
-    image: "amazon/aws-xray-daemon"
-    environment:
-      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
-      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
-      AWS_REGION: "eu-west-2"
-    command:
-      - "xray -o -b xray-daemon:2000"
-    ports:
-      - 2000:2000/udp
-  db:
-    image: postgres:13-alpine
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-    ports:
-      - '5432:5432'
-    volumes: 
-      - db:/var/lib/postgresql/data  
-  dynamodb-local:
+#  xray-daemon:
+#    image: "amazon/aws-xray-daemon"
+#    environment:
+#      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+#      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+#      AWS_REGION: "eu-west-2"
+#    command:
+#      - "xray -o -b xray-daemon:2000"
+#    ports:
+#      - 2000:2000/udp
+#  db:
+#    image: postgres:13-alpine
+#    restart: always
+#    environment:
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=password
+#    ports:
+#      - '5432:5432'
+#    volumes: 
+#      - db:/var/lib/postgresql/data  
+#  dynamodb-local:
     # https://stackoverflow.com/questions/67533058/persist-local-dynamodb-data-in-volumes-lack-permission-unable-to-open-databa
     # We needed to add user:root to get this working.
-    user: root
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-    image: "amazon/dynamodb-local:latest"
-    container_name: dynamodb-local
-    ports:
-      - "8000:8000"
-    volumes:
-      - "./docker/dynamodb:/home/dynamodblocal/data"
-    working_dir: /home/dynamodblocal
+#    user: root
+#    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+#    image: "amazon/dynamodb-local:latest"
+#    container_name: dynamodb-local
+#    ports:
+#      - "8000:8000"
+#    volumes:
+#      - "./docker/dynamodb:/home/dynamodblocal/data"
+#    working_dir: /home/dynamodblocal
   
-volumes: 
-  - "./docker/dynamodb:/home/dynamodblocal/data"
+#volumes: 
+#  - "./docker/dynamodb:/home/dynamodblocal/data"
 
-volumes: 
-  - db:/var/lib/postgresql/data
+#volumes: 
+#  - db:/var/lib/postgresql/data
 
 volumes:
   db:

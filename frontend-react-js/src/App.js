@@ -16,10 +16,25 @@ import {
   RouterProvider
 } from "react-router-dom";
 
+import { BasicTracerProvider } from '@opentelemetry/sdk-trace-base';
+import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
+
+const provider = new WebTracerProvider({
+  plugins: [],
+});
+
+const exporter = new ConsoleSpanExporter();
+const processor = new SimpleSpanProcessor(exporter);
+
+provider.addSpanProcessor(processor);
+
+const tracer = provider.getTracer('example-tracer');
+
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomeFeedPage />
+    element: <HomeFeedPage tracer={tracer} />
   },
   {
     path: "/notifications",

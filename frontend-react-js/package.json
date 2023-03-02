@@ -16,6 +16,7 @@
     "web-vitals": "^2.1.4",
     "@opentelemetry/api":"~1.4.0",
     "@opentelemetry/sdk-trace-web":"~1.9.1",
+    "@opentelemetry/sdk-trace-base":"~1.9.1",
     "@opentelemetry/exporter-trace-otlp-http":"~0.35.1",
     "@opentelemetry/context-zone":"~1.9.1",
     "@opentelemetry/instrumentation-xml-http-request":"~0.35.1",

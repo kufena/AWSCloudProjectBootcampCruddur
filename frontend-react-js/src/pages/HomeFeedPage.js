@@ -10,11 +10,9 @@ import ReplyForm from '../components/ReplyForm';
 // [TODO] Authenication
 import Cookies from 'js-cookie'
 
-//import { trace, context, } from '@opentelemetry/api';
+import { trace, context, } from '@opentelemetry/api';
 
-//const tracer = trace.getTracer();
-
-export default function HomeFeedPage() {
+export default function HomeFeedPage(props) {
   const [activities, setActivities] = React.useState([]);
   const [popped, setPopped] = React.useState(false);
   const [poppedReply, setPoppedReply] = React.useState(false);
@@ -25,11 +23,11 @@ export default function HomeFeedPage() {
   const loadData = async () => {
     try {
 
-      //span = tracer.startActiveSpan("browser.homefeed", span =>
-      //{
-      //  span.setAttribute("action","loadData");
-      //  span.end();
-      //});
+      spanner = props.tracer.startActiveSpan("browser.homefeed", span =>
+      {
+        span.setAttribute("action","loadData");
+        span.end();
+      });
       
       const backend_url = `${process.env.REACT_APP_BACKEND_URL}/api/activities/home`
       const res = await fetch(backend_url, {
