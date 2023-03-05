@@ -12,7 +12,7 @@ import Cookies from 'js-cookie'
 
 //import { trace, context, } from '@opentelemetry/api';
 
-export default function HomeFeedPage(props) {
+export default function HomeFeedPage() {
   const [activities, setActivities] = React.useState([]);
   const [popped, setPopped] = React.useState(false);
   const [poppedReply, setPoppedReply] = React.useState(false);

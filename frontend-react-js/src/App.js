@@ -34,7 +34,7 @@ import {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomeFeedPage /> //tracer={tracer} />
+    element: <HomeFeedPage />
   },
   {
     path: "/notifications",
