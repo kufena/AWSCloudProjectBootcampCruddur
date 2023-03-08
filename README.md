@@ -31,3 +31,11 @@ The `/journal` directory contains
 - [ ] [Week 11](journal/week11.md)
 - [ ] [Week 12](journal/week12.md)
 - [ ] [Week 13](journal/week13.md)
+
+## Notes for users.
+
+You can set a password as permanent for a user in cognito with
+
+```
+aws cognito-idp admin-set-user-password --user-pool-id <userpoolid> --username <username> --password <new password> --permanent
+```
