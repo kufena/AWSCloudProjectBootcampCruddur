@@ -1,6 +1,9 @@
 from flask import Flask
 from flask import request
 from flask_cors import CORS, cross_origin
+from flask import jsonify
+from flask_awscognito import AWSCognitoAuthentication
+
 import os
 
 from services.home_activities import *
@@ -56,6 +59,16 @@ trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)
 
 app = Flask(__name__)
+
+# Authentication via Flask_AWSCOGNITO
+app.config['AWS_DEFAULT_REGION'] = os.getenv("AWS_DEFAULT_REGION")
+app.config['AWS_COGNITO_DOMAIN'] = 'domain.com'
+app.config['AWS_COGNITO_USER_POOL_ID'] = os.getenv("AWS_COGNITO_USER_POOL_ID")
+app.config['AWS_COGNITO_USER_POOL_CLIENT_ID'] = os.getenv("AWS_COGNITO_USER_POOL_CLIENT_ID")
+app.config['AWS_COGNITO_USER_POOL_CLIENT_SECRET'] = 'ZZZZ'
+app.config['AWS_COGNITO_REDIRECT_URL'] = 'http://localhost:5000/aws_cognito_redirect'
+
+aws_auth = AWSCognitoAuthentication(app)
 
 # Honeycomb
 FlaskInstrumentor().instrument_app(app)
@@ -153,11 +166,13 @@ def data_create_message():
   return
 
 @app.route("/api/activities/home", methods=['GET'])
+@aws_auth.authentication_required
 def data_home():
   data = HomeActivities.run(Logger=LOGGER)
   return data, 200
 
 @app.route("/api/activities/notifications", methods=['GET'])
+@aws_auth.authentication_required
 def data_notifications():
   data = NotificationsActivities.run()
   return data, 200
