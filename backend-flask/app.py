@@ -170,12 +170,12 @@ def data_home():
     aws_auth.verify(access_token)
     claims = aws_auth.claims
     app.logger.debug(claims)
-    data = HomeActivities.run(Logger=LOGGER)
+    data = HomeActivities.run(username=claims['username'])
     return data, 200
   except TokenVerifyError as e:
-    app.logger(e);
-    app.logger("Error authenticating");
-    return 401
+    app.logger.error(e);
+    app.logger.error("Error authenticating");
+    return "",401
 
 @app.route("/api/activities/notifications", methods=['GET'])
 def data_notifications():
