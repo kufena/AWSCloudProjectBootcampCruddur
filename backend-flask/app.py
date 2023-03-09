@@ -168,6 +168,9 @@ def data_create_message():
 @app.route("/api/activities/home", methods=['GET'])
 @aws_auth.authentication_required
 def data_home():
+  claims = aws_auth.claims
+  app.logger.info(claims)
+  print("claims",claims)
   data = HomeActivities.run(Logger=LOGGER)
   return data, 200
 
