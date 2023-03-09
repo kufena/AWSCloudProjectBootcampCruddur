@@ -2,7 +2,7 @@ from flask import Flask
 from flask import request
 from flask_cors import CORS, cross_origin
 from flask import jsonify
-from flask_awscognito import AWSCognitoAuthentication
+from lib.cognito_token_verification import CognitoTokenVerification, TokenVerifyError
 
 import os
 
@@ -36,9 +36,9 @@ import logging
 from time import strftime
 
 # Rollbar specific
-import rollbar
-import rollbar.contrib.flask
-from flask import got_request_exception
+#import rollbar
+#import rollbar.contrib.flask
+#from flask import got_request_exception
 
 # Configuring Logger to Use CloudWatch
 LOGGER = logging.getLogger(__name__)
@@ -61,14 +61,11 @@ tracer = trace.get_tracer(__name__)
 app = Flask(__name__)
 
 # Authentication via Flask_AWSCOGNITO
-app.config['AWS_DEFAULT_REGION'] = os.getenv("AWS_DEFAULT_REGION")
-app.config['AWS_COGNITO_DOMAIN'] = 'domain.com'
-app.config['AWS_COGNITO_USER_POOL_ID'] = os.getenv("AWS_COGNITO_USER_POOL_ID")
-app.config['AWS_COGNITO_USER_POOL_CLIENT_ID'] = os.getenv("AWS_COGNITO_USER_POOL_CLIENT_ID")
-app.config['AWS_COGNITO_USER_POOL_CLIENT_SECRET'] = 'ZZZZ'
-app.config['AWS_COGNITO_REDIRECT_URL'] = 'http://localhost:5000/aws_cognito_redirect'
+aws_default_region = os.getenv("AWS_DEFAULT_REGION")
+user_pool_id = os.getenv("AWS_COGNITO_USER_POOL_ID")
+user_pool_client_id = os.getenv("AWS_COGNITO_USER_POOL_CLIENT_ID")
 
-aws_auth = AWSCognitoAuthentication(app)
+aws_auth = CognitoTokenVerification(user_pool_id, user_pool_client_id, aws_default_region)
 
 # Honeycomb
 FlaskInstrumentor().instrument_app(app)
@@ -108,26 +105,26 @@ def after_request(response):
     return response
 
 # Rollbar
-@app.before_first_request
-def init_rollbar():
-    """init rollbar module"""
-    rollbar.init(
-        # access token
-        os.getenv("ROLLBAR_ACCESS_TOKEN"),
-        # environment name
-        'production',
-        # server root directory, makes tracebacks prettier
-        root=os.path.dirname(os.path.realpath(__file__)),
-        # flask already sets up logging
-        allow_logging_basic_config=False)
+#@app.before_first_request
+#def init_rollbar():
+#    """init rollbar module"""
+#    rollbar.init(
+#        # access token
+#        os.getenv("ROLLBAR_ACCESS_TOKEN"),
+#        # environment name
+#        'production',
+#        # server root directory, makes tracebacks prettier
+#        root=os.path.dirname(os.path.realpath(__file__)),
+#        # flask already sets up logging
+#        allow_logging_basic_config=False)
+#
+#    # send exceptions from `app` to rollbar, using flask's signal system.
+#    got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
 
-    # send exceptions from `app` to rollbar, using flask's signal system.
-    got_request_exception.connect(rollbar.contrib.flask.report_exception, app)
-
-@app.route("/rollbar/test")
-def rollbar_test():
-  rollbar.report_message('Hello World!','warning')
-  return "Hello World!"
+#@app.route("/rollbar/test")
+#def rollbar_test():
+#  rollbar.report_message('Hello World!','warning')
+#  return "Hello World!"
 
 # Normal stuff
 @app.route("/api/message_groups", methods=['GET'])
@@ -166,16 +163,21 @@ def data_create_message():
   return
 
 @app.route("/api/activities/home", methods=['GET'])
-@aws_auth.authentication_required
 def data_home():
-  claims = aws_auth.claims
-  app.logger.info(claims)
-  print("claims",claims)
-  data = HomeActivities.run(Logger=LOGGER)
-  return data, 200
+  access_token = aws_auth.extract_access_token(request.headers)
+  try:
+    app.logger.debug(access_token)
+    aws_auth.verify(access_token)
+    claims = aws_auth.claims
+    app.logger.debug(claims)
+    data = HomeActivities.run(Logger=LOGGER)
+    return data, 200
+  except TokenVerifyError as e:
+    app.logger(e);
+    app.logger("Error authenticating");
+    return 401
 
 @app.route("/api/activities/notifications", methods=['GET'])
-@aws_auth.authentication_required
 def data_notifications():
   data = NotificationsActivities.run()
   return data, 200
