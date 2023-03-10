@@ -170,6 +170,8 @@ def data_home():
     aws_auth.verify(access_token)
     claims = aws_auth.claims
     app.logger.debug(claims)
+    #user_info = aws_auth.get_user_info(access_token)
+    #app.logger.debug(user_info)
     data = HomeActivities.run(username=claims['username'])
     return data, 200
   except TokenVerifyError as e:

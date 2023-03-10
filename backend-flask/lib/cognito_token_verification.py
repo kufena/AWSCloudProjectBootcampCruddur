@@ -5,6 +5,7 @@ from jose.exceptions import JOSEError
 from jose.utils import base64url_decode
 
 HTTP_HEADER = "Authorization"
+DOMAIN_URL = "https://gatehousewereham.auth.eu-west-2.amazoncognito.com";
 
 class FlaskAWSCognitoError(Exception):
     pass
@@ -118,3 +119,15 @@ class CognitoTokenVerification:
         self._check_audience(claims)
 
         self.claims = claims
+
+    def get_user_info(self, access_token, requests_client=None):
+        user_url = f"{DOMAIN_URL}/oauth2/userInfo"
+        header = {"Authorization": f"Bearer {access_token}"}
+        try:
+            if not requests_client:
+                requests_client = requests.post
+            response = requests_client(user_url, headers=header)
+            response_json = response.json()
+        except requests.exceptions.RequestException as e:
+            raise FlaskAWSCognitoError(str(e)) from e
+        return response_json
