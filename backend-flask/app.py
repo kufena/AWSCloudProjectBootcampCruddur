@@ -35,6 +35,8 @@ import watchtower
 import logging
 from time import strftime
 
+from auth_middleware import middleware
+
 # Rollbar specific
 #import rollbar
 #import rollbar.contrib.flask
@@ -59,13 +61,15 @@ trace.set_tracer_provider(provider)
 tracer = trace.get_tracer(__name__)
 
 app = Flask(__name__)
+app.wsgi_app = middleware(app.wsgi_app)
+#app = middleware(app)
 
 # Authentication via Flask_AWSCOGNITO
-aws_default_region = os.getenv("AWS_DEFAULT_REGION")
-user_pool_id = os.getenv("AWS_COGNITO_USER_POOL_ID")
-user_pool_client_id = os.getenv("AWS_COGNITO_USER_POOL_CLIENT_ID")
+#aws_default_region = os.getenv("AWS_DEFAULT_REGION")
+#user_pool_id = os.getenv("AWS_COGNITO_USER_POOL_ID")
+#user_pool_client_id = os.getenv("AWS_COGNITO_USER_POOL_CLIENT_ID")
 
-aws_auth = CognitoTokenVerification(user_pool_id, user_pool_client_id, aws_default_region)
+#aws_auth = CognitoTokenVerification(user_pool_id, user_pool_client_id, aws_default_region)
 
 # Honeycomb
 FlaskInstrumentor().instrument_app(app)
@@ -164,20 +168,20 @@ def data_create_message():
 
 @app.route("/api/activities/home", methods=['GET'])
 def data_home():
-  access_token = aws_auth.extract_access_token(request.headers)
-  try:
-    app.logger.debug(access_token)
-    aws_auth.verify(access_token)
-    claims = aws_auth.claims
-    app.logger.debug(claims)
+  #access_token = aws_auth.extract_access_token(request.headers)
+  #try:
+  #  app.logger.debug(access_token)
+  #  aws_auth.verify(access_token)
+  #  claims = aws_auth.claims
+  #  app.logger.debug(claims)
     #user_info = aws_auth.get_user_info(access_token)
     #app.logger.debug(user_info)
     data = HomeActivities.run(username=claims['username'])
     return data, 200
-  except TokenVerifyError as e:
-    app.logger.error(e);
-    app.logger.error("Error authenticating");
-    return "",401
+  #except TokenVerifyError as e:
+  #  app.logger.error(e);
+  #  app.logger.error("Error authenticating");
+  #  return "",401
 
 @app.route("/api/activities/notifications", methods=['GET'])
 def data_notifications():
