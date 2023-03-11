@@ -1,0 +1,9 @@
+#! /usr/bin/bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+echo $SCRIPT_DIR
+
+$SCRIPT_DIR/db-drop
+$SCRIPT_DIR/db-create
+$SCRIPT_DIR/db-schema-load
+$SCRIPT_DIR/db-seed
