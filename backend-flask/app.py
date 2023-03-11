@@ -3,7 +3,7 @@ from flask import request
 from flask_cors import CORS, cross_origin
 from flask import jsonify
 from lib.cognito_token_verification import CognitoTokenVerification, TokenVerifyError
-
+from functools import wraps
 import os
 
 from services.home_activities import *
@@ -110,6 +110,22 @@ def after_request(response):
     LOGGER.error('%s %s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path, response.status)
     return response
 
+# decorator for token auth
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        app.logger.debug(request.headers)
+        access_token = aws_auth.extract_access_token(request.headers)
+        if (access_token is None):
+            return '{"message": "no access token"}', 401
+        try:
+            aws_auth.verify(access_token)
+            return f(*args, **kwargs)
+        except TokenVerifyError as e:        
+            app.logger.debug(e)
+            return '{"message": "failed to verify"}', 403
+    return decorated
+
 # Rollbar
 #@app.before_first_request
 #def init_rollbar():
@@ -169,22 +185,23 @@ def data_create_message():
   return
 
 @app.route("/api/activities/home", methods=['GET'])
+@token_required
 def data_home():
-  access_token = aws_auth.extract_access_token(request.headers)
-  try:
-    app.logger.debug(access_token)
-    aws_auth.verify(access_token)
-    claims = aws_auth.claims
-    app.logger.debug(claims)
+  #access_token = aws_auth.extract_access_token(request.headers)
+  #try:
+  #  app.logger.debug(access_token)
+  #  aws_auth.verify(access_token)
+  #  claims = aws_auth.claims
+  #  app.logger.debug(claims)
     #user_info = aws_auth.get_user_info(access_token)
     #app.logger.debug(user_info)
-    data = HomeActivities.run(username=claims['username'])
+    data = HomeActivities.run() #username=claims['username'])
     return data, 200
-  except TokenVerifyError as e:
-    app.logger.error(e);
-    app.logger.error("Error authenticating");
-    data = HomeActivities.run(username=None)
-    return data, 200
+  #except TokenVerifyError as e:
+  #  app.logger.error(e);
+  #  app.logger.error("Error authenticating");
+  #  data = HomeActivities.run(username=None)
+  #  return data, 200
 
 
 @app.route("/api/activities/notifications", methods=['GET'])
