@@ -23,3 +23,13 @@ tasks:
       wget https://s3.us-east-2.amazonaws.com/aws-xray-assets.us-east-2/xray-daemon/aws-xray-daemon-3.x.deb
       sudo dpkg -i **.deb
       rm aws-xray-daemon*.deb
+  - name: postgres
+    init: |
+      cd /workspace
+      curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc|sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg
+      echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" |sudo tee  /etc/apt/sources.list.d/pgdg.list
+      sudo apt update
+      sudo apt install -y postgresql-client-13 libpq-dev
+    command: |
+      export GITPOD_IP=$(curl ifconfig.me)
+      source  "$THEIA_WORKSPACE_ROOT/backend-flask/db-update-sg-rule"
