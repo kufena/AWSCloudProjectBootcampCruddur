@@ -5,7 +5,8 @@ services:
       FRONTEND_URL: "https://3000-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
       BACKEND_URL: "https://4567-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}"
       #CONNECTION_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@5432-${GITPOD_WORKSPACE_ID}.${GITPOD_WORKSPACE_CLUSTER_HOST}:5432/cruddur"
-      CONNECTION_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/cruddur"
+      #CONNECTION_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/cruddur"
+      CONNECTION_URL: "${PROD_CONNECTION_URL}"
       OTEL_SERVICE_NAME: "backend-flask"
       OTEL_EXPORTER_OTLP_ENDPOINT: "https://api.honeycomb.io"
       OTEL_EXPORTER_OTLP_HEADERS: "x-honeycomb-team=${HONEYCOMB_API_KEY}"
@@ -45,16 +46,16 @@ services:
 #      - "xray -o -b xray-daemon:2000"
 #    ports:
 #      - 2000:2000/udp
-  db:
-    image: postgres:13-alpine
-    restart: always
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-    ports:
-      - '5432:5432'
-    volumes: 
-      - db:/var/lib/postgresql/data  
+#  db:
+#    image: postgres:13-alpine
+#    restart: always
+#    environment:
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=password
+#    ports:
+#      - '5432:5432'
+#    volumes: 
+#      - db:/var/lib/postgresql/data  
 #  dynamodb-local:
 #    # https://stackoverflow.com/questions/67533058/persist-local-dynamodb-data-in-volumes-lack-permission-unable-to-open-databa
 #    # We needed to add user:root to get this working.
