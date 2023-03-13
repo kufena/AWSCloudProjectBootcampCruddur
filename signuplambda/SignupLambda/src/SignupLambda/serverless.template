@@ -3,13 +3,43 @@
   "Transform": "AWS::Serverless-2016-10-31",
   "Description": "An AWS Serverless Application.",
   "Resources": {
-    "Get": {
+    "CruddurUserPool": {
+      "Type": "AWS::Cognito::UserPool",
+      "Properties": {
+        "AccountRecoverySetting": {
+          "RecoveryMechanisms": [ { "Name": "verified_email", "Priority": 1 } ]
+        },
+        "Schema": [
+          {
+          "Name": "email",
+          "AttributeDataType": "String"
+          }
+        ],
+        "MfaConfiguration": "OFF",
+        "EmailConfiguration": {
+          "EmailSendingAccount": "COGNITO_DEFAULT",
+
+        },
+        "AliasAttributes": ["email"],
+
+      }
+    },
+    "CruddurUserPoolClient": {
+      "Type": "AWS::Cognito::UserPoolClient",
+      "Properties": {
+        "UserPoolId": {"Ref": "CruddurUserPool" },
+        "ExplicitAuthFlows": ["ALLOW_USER_SRP_AUTH","ALLOW_CUSTOM_AUTH","ALLOW_REFRESH_TOKEN_AUTH"],
+        "GenerateSecret": "False",
+
+      }
+    },
+    "Deploy": {
       "Type": "AWS::Serverless::Function",
       "Properties": {
         "Architectures": [
           "x86_64"
         ],
-        "Handler": "SignupLambda::SignupLambda.Functions::Get",
+        "Handler": "SignupLambda::SignupLambda.Functions::FunctionHandler",
         "Runtime": "dotnet6",
         "CodeUri": "",
         "MemorySize": 256,
@@ -19,23 +49,25 @@
           "AWSLambdaBasicExecutionRole"
         ],
         "Events": {
-          "RootGet": {
-            "Type": "Api",
-            "Properties": {
-              "Path": "/",
-              "Method": "GET"
-            }
+          "PostSignUp": {
+              "Type": "Cognito",
+              "Properties": {
+                 "Trigger": "PostConfirmation",
+                 "UserPool": {"Ref": "CruddurUserPool"}
+              }
           }
         }
       }
     }
   },
   "Outputs": {
-    "ApiURL": {
-      "Description": "API endpoint URL for Prod environment",
-      "Value": {
-        "Fn::Sub": "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
-      }
+    "UserPool": {
+      "Description": "UserPoolId",
+      "Value": {"Ref": "CruddurUserPool"}
+    },
+    "UserPoolClient": {
+      "Description" "UserPoolClientId",
+      "Value": {"Ref": "CruddurUserPoolClient"}
     }
   }
 }
