@@ -185,7 +185,7 @@ def data_create_message():
   return
 
 @app.route("/api/activities/home", methods=['GET'])
-#@token_required
+@token_required
 def data_home():
   #access_token = aws_auth.extract_access_token(request.headers)
   #try:
