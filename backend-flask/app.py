@@ -18,12 +18,12 @@ from services.create_message import *
 from services.show_activity import *
 
 # Honeycomb io otel tracing.
-from opentelemetry import trace
-from opentelemetry.instrumentation.flask import FlaskInstrumentor
-from opentelemetry.instrumentation.requests import RequestsInstrumentor
-from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor
+#from opentelemetry import trace
+#from opentelemetry.instrumentation.flask import FlaskInstrumentor
+#from opentelemetry.instrumentation.requests import RequestsInstrumentor
+#from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+#from opentelemetry.sdk.trace import TracerProvider
+#from opentelemetry.sdk.trace.export import BatchSpanProcessor
 # from opentelemetry.sdk.trace.export import ConsoleSpanExporter, SimpleSpanProcessor
 
 # XRay specific imports and stuff.
@@ -43,22 +43,22 @@ from auth_middleware import middleware
 #from flask import got_request_exception
 
 # Configuring Logger to Use CloudWatch
-LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
-console_handler = logging.StreamHandler()
-cw_handler = watchtower.CloudWatchLogHandler(log_group='cruddur')
-LOGGER.addHandler(console_handler)
-LOGGER.addHandler(cw_handler)
-LOGGER.info("some message")
+#LOGGER = logging.getLogger(__name__)
+#LOGGER.setLevel(logging.DEBUG)
+#console_handler = logging.StreamHandler()
+#cw_handler = watchtower.CloudWatchLogHandler(log_group='cruddur')
+#LOGGER.addHandler(console_handler)
+#LOGGER.addHandler(cw_handler)
+#LOGGER.info("some message")
 
 # Initialize tracing and an exporter that can send data to Honeycomb
-provider = TracerProvider()
-processor = BatchSpanProcessor(OTLPSpanExporter())
-provider.add_span_processor(processor)
+#provider = TracerProvider()
+#processor = BatchSpanProcessor(OTLPSpanExporter())
+#provider.add_span_processor(processor)
 # consoleprocessor = SimpleSpanProcessor(ConsoleSpanExporter)
 # provider.add_span_processor(consoleprocessor)
-trace.set_tracer_provider(provider)
-tracer = trace.get_tracer(__name__)
+#trace.set_tracer_provider(provider)
+#tracer = trace.get_tracer(__name__)
 
 app = Flask(__name__)
 #app = middleware(app)
@@ -71,8 +71,8 @@ user_pool_client_id = os.getenv("AWS_COGNITO_USER_POOL_CLIENT_ID")
 aws_auth = CognitoTokenVerification(user_pool_id, user_pool_client_id, aws_default_region)
 
 # Honeycomb
-FlaskInstrumentor().instrument_app(app)
-RequestsInstrumentor().instrument()
+#FlaskInstrumentor().instrument_app(app)
+#RequestsInstrumentor().instrument()
 
 # X-Ray middleware initialisation.
 #xray_url = os.getenv("AWS_XRAY_URL")
@@ -104,11 +104,11 @@ cors = CORS(
 #app.wsgi_app.logger = app.logger
 
 # Watchtower logging after requests, especially for errors.
-@app.after_request
-def after_request(response):
-    timestamp = strftime('[%Y-%b-%d %H:%M]')
-    LOGGER.error('%s %s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path, response.status)
-    return response
+#@app.after_request
+#def after_request(response):
+#    timestamp = strftime('[%Y-%b-%d %H:%M]')
+#    LOGGER.error('%s %s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path, response.status)
+#    return response
 
 # decorator for token auth
 def token_required(f):
@@ -185,7 +185,7 @@ def data_create_message():
   return
 
 @app.route("/api/activities/home", methods=['GET'])
-@token_required
+#@token_required
 def data_home():
   #access_token = aws_auth.extract_access_token(request.headers)
   #try:

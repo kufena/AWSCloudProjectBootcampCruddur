@@ -1,13 +1,13 @@
 from datetime import datetime, timedelta, timezone
-from opentelemetry import trace
+#from opentelemetry import trace
 import logging
 from lib.db import pool, query_wrap_array
 
-tracer = trace.get_tracer("home.activities")
+#tracer = trace.get_tracer("home.activities")
 
 class HomeActivities:
   def run(username=None):
-    with tracer.start_as_current_span("home-activities-mock-data"):
+    #with tracer.start_as_current_span("home-activities-mock-data"):
     
       now = datetime.now(timezone.utc).astimezone()
       sql = query_wrap_array("""
@@ -32,5 +32,5 @@ class HomeActivities:
           cur.execute(sql)
           # this will return a tuple
           # the first field being the data
-          json = cur.fetchall()
-          return json[0]
+          json = cur.fetchone()
+      return json[0]
