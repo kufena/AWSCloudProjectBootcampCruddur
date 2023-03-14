@@ -51,7 +51,6 @@
         "Runtime": "dotnet6",
         "CodeUri": "",
         "MemorySize": 256,
-        "Timeout": 30,
         "Role": null,
         "Policies": [
           "AWSLambdaBasicExecutionRole"
@@ -60,7 +59,7 @@
           "SubnetIds": ["subnet-de83deb7","subnet-54ab322e","subnet-5815b914"],
           "SecurityGroupIds": ["sg-1f52447b"]
         },
-        "Timeout": 300,
+        "Timeout": 30,
         "Events": {
           "PostSignUp": {
               "Type": "Cognito",
