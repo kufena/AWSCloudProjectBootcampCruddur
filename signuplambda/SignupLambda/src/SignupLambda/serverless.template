@@ -12,15 +12,23 @@
         "Schema": [
           {
           "Name": "email",
-          "AttributeDataType": "String"
+          "AttributeDataType": "String",
+          "Required": "True"
+          },
+          {
+          "Name": "name",
+          "AttributeDataType": "String",
+          "Required": "True"
           }
         ],
         "MfaConfiguration": "OFF",
         "EmailConfiguration": {
-          "EmailSendingAccount": "COGNITO_DEFAULT",
-
+          "EmailSendingAccount": "COGNITO_DEFAULT"
         },
-        "AliasAttributes": ["email"],
+        "VerificationMessageTemplate": {
+          "DefaultEmailOption": "CONFIRM_WITH_CODE"
+        },
+        "UsernameAttributes": ["email"]
 
       }
     },
@@ -48,6 +56,11 @@
         "Policies": [
           "AWSLambdaBasicExecutionRole"
         ],
+        "VpcConfig": {
+          "SubnetIds": ["subnet-de83deb7","subnet-54ab322e","subnet-5815b914"],
+          "SecurityGroupIds": ["sg-1f52447b"]
+        },
+        "Timeout": 300,
         "Events": {
           "PostSignUp": {
               "Type": "Cognito",
