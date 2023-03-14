@@ -31,26 +31,35 @@ public class Functions
     /// </summary>
     /// <param name="request"></param>
     /// <returns>Json object?</returns>
-    public async Task<JsonElement> FunctionHandler(JsonElement input, ILambdaContext context)
-{
-    var request = input.GetProperty("request");
-    var userAttributes = request.GetProperty("userAttributes");
-    string? email = userAttributes.GetProperty("email").GetString();
-    string? user_cognito_id = userAttributes.GetProperty("sub").GetString();
-    string? display_name = userAttributes.GetProperty("name").GetString();
-    string? handle = userAttributes.GetProperty("preferred_username").GetString();
+    //public async Task<JsonElement> FunctionHandler(JsonElement input, ILambdaContext context)
+    public JsonElement FunctionHandler(JsonElement input, ILambdaContext context)
+    {
 
-    if (Connection_String is null) {
-        throw new Exception("no connection string found.");
+        context.Logger.LogInformation("let's at least see this!");
+
+        var request = input.GetProperty("request");
+        var userAttributes = request.GetProperty("userAttributes");
+        string? email = userAttributes.GetProperty("email").GetString();
+        string? user_cognito_id = userAttributes.GetProperty("sub").GetString();
+        string? display_name = userAttributes.GetProperty("name").GetString();
+        string? handle = userAttributes.GetProperty("preferred_username").GetString();
+
+        context.Logger.LogInformation("We've got something here!");
+        context.Logger.LogInformation(userAttributes.ToString());
+        context.Logger.LogInformation($"{email} {display_name} {handle} {user_cognito_id}");
+        if (Connection_String is null) {
+            throw new Exception("no connection string found.");
+        }
+
+        context.Logger.LogInformation($"{Connection_String}");
+
+        using (UserDbContext db = new UserDbContext(Connection_String)) {
+            UserModel um = new UserModel(email, user_cognito_id, display_name, handle);
+            if (db.Users != null) db.Users.Add(um);
+
+            db.SaveChanges();
+            Console.WriteLine($"New uuid is {um.uuid}");
+        }
+        return input;
     }
-
-    using (UserDbContext db = new UserDbContext(Connection_String)) {
-        UserModel um = new UserModel(email, user_cognito_id, display_name, handle);
-        if (db.Users != null) db.Users.Add(um);
-
-        db.SaveChanges();
-        Console.WriteLine($"New uuid is {um.uuid}");
-    }
-    return input;
-}
 }
