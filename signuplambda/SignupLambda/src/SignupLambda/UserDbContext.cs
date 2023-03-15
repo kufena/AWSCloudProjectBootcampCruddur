@@ -16,4 +16,12 @@ public class UserDbContext : DbContext
     {
         optionsBuilder.UseNpgsql(connectionString);
     }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<UserModel>()
+            .HasKey(obj => obj.uuid);
+        modelBuilder.Entity<UserModel>()
+            .Property(obj => obj.uuid).ValueGeneratedOnAdd();
+    }   
 }
