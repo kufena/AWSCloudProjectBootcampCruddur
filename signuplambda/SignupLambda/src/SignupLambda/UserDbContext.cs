@@ -10,7 +10,7 @@ public class UserDbContext : DbContext
         connectionString = connString;
     }
 
-    public DbSet<UserModel>? Users { get; set; }
+    public DbSet<UserModel>? users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -23,5 +23,9 @@ public class UserDbContext : DbContext
             .HasKey(obj => obj.uuid);
         modelBuilder.Entity<UserModel>()
             .Property(obj => obj.uuid).ValueGeneratedOnAdd();
+        modelBuilder.Entity<UserModel>()
+            .Property(x => x.uuid)
+            .HasColumnType("uuid")
+            .HasConversion<Guid>();
     }   
 }
