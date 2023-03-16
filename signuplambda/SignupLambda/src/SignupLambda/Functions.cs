@@ -54,11 +54,31 @@ public class Functions
         context.Logger.LogInformation($"{Connection_String}");
 
         using (UserDbContext db = new UserDbContext(Connection_String)) {
-            UserModel um = new UserModel(email, user_cognito_id, display_name, handle);
-            if (db.Users != null) db.Users.Add(um);
+            UserModel um = new UserModel() {
+                email = email, 
+                cognito_user_id = user_cognito_id, 
+                display_name = display_name, 
+                handle = handle
+            };
 
-            db.SaveChanges();
-            Console.WriteLine($"New uuid is {um.uuid}");
+            if (db.users != null) {
+                db.users.Add(um);
+
+                var model = db.users;
+                var entityType = model.EntityType;
+                var tableNameAnnotation = entityType.GetAnnotation("Relational:TableName");
+                if (tableNameAnnotation != null) {
+                    string tableName = "";
+                    if (tableNameAnnotation.Value != null) {
+                        var tableRep = tableNameAnnotation.Value;
+                        tableName = tableRep.ToString();
+                    }
+                    context.Logger.LogInformation($"Table name is {tableName}");
+                }
+
+                db.SaveChanges();
+                Console.WriteLine($"New uuid is {um.uuid}");
+            }
         }
         return input;
     }
