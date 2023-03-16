@@ -3,6 +3,8 @@ using Amazon.Lambda.Core;
 using Amazon.Extensions.Configuration.SystemsManager;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using Amazon.SimpleSystemsManagement;
+using Amazon.SimpleSystemsManagement.Model;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -12,17 +14,20 @@ namespace SignupLambda;
 public class Functions
 {
 
-    string? Connection_String { get; init; }
+    AmazonSimpleSystemsManagementClient ssm_client;
+
     /// <summary>
     /// Default constructor that Lambda will invoke.
     /// </summary>
     public Functions()
     {
-        var configurations = new ConfigurationBuilder()
-                        .AddSystemsManager("/cruddur/")
-                        .AddAppConfigUsingLambdaExtension("AppConfigApplicationId", "AppConfigEnvironmentId", "AppConfigConfigurationProfileId")
-                        .Build();
-        Connection_String = configurations["postgres-connection-string"];
+        ssm_client = new AmazonSimpleSystemsManagementClient();
+
+        //var configurations = new ConfigurationBuilder()
+        //                .AddSystemsManager("/cruddur/")
+        //                .AddAppConfigUsingLambdaExtension("AppConfigApplicationId", "AppConfigEnvironmentId", "AppConfigConfigurationProfileId")
+        //                .Build();
+        //Connection_String = configurations["postgres-connection-string"];
     }
 
 
@@ -34,7 +39,13 @@ public class Functions
     //public async Task<JsonElement> FunctionHandler(JsonElement input, ILambdaContext context)
     public JsonElement FunctionHandler(JsonElement input, ILambdaContext context)
     {
+        string? ConnectionHost = Environment.GetEnvironmentVariable("ConnectionHost");
+        string? ConnectionDB = Environment.GetEnvironmentVariable("ConnectionDB");
+        string? ConnectionUsername = Environment.GetEnvironmentVariable("ConnectionUsername");
+        string? ConnectionPassword = Environment.GetEnvironmentVariable("ConnectionPassword");
 
+        string Connection_String = $"Host={ConnectionHost};Database={ConnectionDB};Username={ConnectionUsername};Password={ConnectionPassword}";    
+        
         context.Logger.LogInformation("let's at least see this!");
 
         var request = input.GetProperty("request");
