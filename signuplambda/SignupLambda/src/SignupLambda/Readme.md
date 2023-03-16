@@ -14,3 +14,5 @@ dotnet lambda deploy-serverless CruddurUserPool2 --s3-bucket thegatehousewereham
 Note the use of quotes around the whole environment/parameter list, as semicolons cause the CLI to think it's a new command (semicolons cause all sorts of issues.)
 
 This sets up the user pool and client as per the instructions in the Free AWS Cloud Boot Camp, but the trigger writes to the DB three times.  I don't know why.
+
+Oh, one last thing - to allow the DB and Trigger and User Pool/Client to talk to each other, you need to allow All TCP communications inside the Security Group.  You'll have to add this manually at the moment.  I started creating a Cloud Formation template for the database, but haven't got very far.  When I have that, I can create a specific VPC set up and dedicated Security Group.
