@@ -26,10 +26,15 @@
           "EmailSendingAccount": "COGNITO_DEFAULT"
         },
         "VerificationMessageTemplate": {
-          "DefaultEmailOption": "CONFIRM_WITH_CODE"
+          "DefaultEmailOption": "CONFIRM_WITH_CODE",
+          "EmailSubject": "Verify your email address"
         },
-        "UsernameAttributes": ["email"]
-
+        "AutoVerifiedAttributes": ["email"],
+        "UserAttributeUpdateSettings": {
+          "AttributesRequireVerificationBeforeUpdate": ["email"]
+        },
+        "UsernameAttributes": ["email"],        
+        "EmailVerificationSubject": "Verify your email address"
       }
     },
     "CruddurUserPoolClient": {
@@ -53,7 +58,9 @@
         "MemorySize": 256,
         "Role": null,
         "Policies": [
-          "AWSLambdaBasicExecutionRole"
+          "AWSLambdaBasicExecutionRole",
+          "AmazonRDSFullAccess",
+          "AmazonSSMFullAccess"
         ],
         "VpcConfig": {
           "SubnetIds": ["subnet-de83deb7","subnet-54ab322e","subnet-5815b914"],
