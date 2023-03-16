@@ -85,7 +85,7 @@
       "Value": {"Ref": "CruddurUserPool"}
     },
     "UserPoolClient": {
-      "Description" "UserPoolClientId",
+      "Description": "UserPoolClientId",
       "Value": {"Ref": "CruddurUserPoolClient"}
     }
   }
