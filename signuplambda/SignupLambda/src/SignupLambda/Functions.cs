@@ -73,24 +73,31 @@ public class Functions
             };
 
             if (db.users != null) {
-                db.users.Add(um);
+                var check = db.users.Where(x => x.cognito_user_id == user_cognito_id);
+                if (check.Count() == 0) {
+                    db.users.Add(um);
 
-                var model = db.users;
-                var entityType = model.EntityType;
-                var tableNameAnnotation = entityType.GetAnnotation("Relational:TableName");
-                if (tableNameAnnotation != null) {
-                    string tableName = "";
-                    if (tableNameAnnotation.Value != null) {
-                        var tableRep = tableNameAnnotation.Value;
-                        tableName = tableRep.ToString();
+                    var model = db.users;
+                    var entityType = model.EntityType;
+                    var tableNameAnnotation = entityType.GetAnnotation("Relational:TableName");
+                    if (tableNameAnnotation != null) {
+                        string tableName = "";
+                        if (tableNameAnnotation.Value != null) {
+                            var tableRep = tableNameAnnotation.Value;
+                            tableName = tableRep.ToString();
+                        }
+                        context.Logger.LogInformation($"Table name is {tableName}");
                     }
-                    context.Logger.LogInformation($"Table name is {tableName}");
-                }
 
-                db.SaveChanges();
-                Console.WriteLine($"New uuid is {um.uuid}");
+                    db.SaveChanges();
+                    Console.WriteLine($"New uuid is {um.uuid}");
+                }
+                else {
+                    context.Logger.LogInformation($"We have already {check.Count()} entries for that cognito user id.");
+                }
             }
         }
+        context.Logger.LogInformation("Leaving now - bye!");
         return input;
     }
 }
